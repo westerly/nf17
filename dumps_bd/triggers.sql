@@ -31,7 +31,7 @@ CREATE OR REPLACE FUNCTION process_update_capteur() RETURNS TRIGGER AS $insert_c
 			
 			IF OLD.lieu_id is not null THEN 
 				-- MAJ de la date de fin de l'historique pour le lieu courant
-				UPDATE historiques SET fin = NOW() WHERE capteur_id = OLD.capteur_id AND lieu_id = OLD.lieu_id;
+				UPDATE historiques SET fin = NOW() WHERE capteur_id = OLD.capteur_id AND fin is null;
 			END IF;
 			
 			-- insertion d'un nouvel historique pour l'affectation du capteur au nouveau lieu
@@ -39,7 +39,7 @@ CREATE OR REPLACE FUNCTION process_update_capteur() RETURNS TRIGGER AS $insert_c
 			VALUES(OLD.capteur_id,NOW(),NEW.lieu_id,null);
 			
 		  ELSE -- Cas ou on met le capteur en réparation
-			UPDATE historiques SET fin = NOW() WHERE capteur_id = OLD.capteur_id AND lieu_id = OLD.lieu_id;
+			UPDATE historiques SET fin = NOW() WHERE capteur_id = OLD.capteur_id AND fin is null;
 		  END IF;
 		END IF;
       RETURN NULL; -- result is ignored since this is an AFTER trigger
