@@ -38,6 +38,7 @@
 				$errors = $db->errorInfo();
 				$error = $errors[2];
 				
+				
 				if(count($error) != 0){
 					var_dump($error);
 				}else{
