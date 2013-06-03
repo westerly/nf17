@@ -30,7 +30,10 @@ function getListeDepartements($name, $empty=false){
 		$list.="<option value='0'/>";
 	}
 	$sql = "SELECT departement_id as id, nom FROM departements ORDER BY departement_id";
-	foreach ($db->query($sql) as $row)
+	$query = $db->prepare($sql);
+	$query->execute();
+	$res = $query->fetchAll();
+	foreach ($res as $row)
 	{
 		$list.= "<option value='".$row['id']."'>".$row['id']."-".$row['nom']."</option>";
 	}

@@ -21,15 +21,12 @@
 					echo "Date (jj/mm/aaaa): ".getInputDate();
 					
 					echo "<br/>";
-					
 					echo "<h1> Précipitation: </h1>";
 					echo "</br> Type de précipitation: ";
 					echo getListeEnum("typePrecipitation", $enum_types);
 					echo " </br> Seuil précipitation (entre 1 et 10): <input type='text' name='seuilpr'/> </br> Force (entre 1 et 10): <input type='text' name='forcepr'/> </br>";
 					
-					echo "</br><textarea name='infopr' rows='4' cols='50'>
-				
-						 </textarea>";
+					echo "</br><textarea name='infopr' rows='4' cols='50'></textarea>";
 						
 					echo "<br/>";
 					echo "Capteur ayant enregistré les mesures: ".getListeCapteurs("capteurpr", false, true);
