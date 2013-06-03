@@ -28,9 +28,7 @@
 					echo "<select/>";
 					echo "<br/>";
 					
-					echo "<textarea name='info' rows='4' cols='50'>
-						 
-						 </textarea>";
+					echo "<textarea name='info' rows='4' cols='50'></textarea>";
 					
 					echo "<br/>";
 					
