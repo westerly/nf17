@@ -8,11 +8,102 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
+SET search_path = public, pg_catalog;
+
+ALTER TABLE ONLY public.villes DROP CONSTRAINT villes_nom_fkey;
+ALTER TABLE ONLY public.villes DROP CONSTRAINT villes_dpt_fkey;
+ALTER TABLE ONLY public.vents DROP CONSTRAINT vents_capteur_id_fkey;
+ALTER TABLE ONLY public.temperatures DROP CONSTRAINT temperatures_capteur_id_fkey;
+ALTER TABLE ONLY public.precipitations DROP CONSTRAINT precipitations_capteur_id_fkey;
+ALTER TABLE ONLY public.massifs DROP CONSTRAINT massifs_nom_fkey;
+ALTER TABLE ONLY public.massifs DROP CONSTRAINT massifs_d2_fkey;
+ALTER TABLE ONLY public.massifs DROP CONSTRAINT massifs_d1_fkey;
+ALTER TABLE ONLY public.historiques DROP CONSTRAINT historiques_lieu_id_fkey;
+ALTER TABLE ONLY public.historiques DROP CONSTRAINT historiques_capteur_id_fkey;
+ALTER TABLE ONLY public.departements DROP CONSTRAINT departements_region_id_fkey;
+ALTER TABLE ONLY public.capteurs DROP CONSTRAINT capteurs_lieu_id_fkey;
+ALTER TABLE ONLY public.bulletins DROP CONSTRAINT bulletins_vent_id_fkey;
+ALTER TABLE ONLY public.bulletins DROP CONSTRAINT bulletins_precipitation_id_fkey1;
+ALTER TABLE ONLY public.bulletins DROP CONSTRAINT bulletins_precipitation_id_fkey;
+ALTER TABLE ONLY public.bulletins DROP CONSTRAINT bulletins_lieu_id_fkey;
+DROP TRIGGER handle_update_capteurs ON public.capteurs;
+DROP TRIGGER handle_create_capteurs ON public.capteurs;
+ALTER TABLE ONLY public.villes DROP CONSTRAINT villes_pkey;
+ALTER TABLE ONLY public.vents DROP CONSTRAINT vents_pkey;
+ALTER TABLE ONLY public.temperatures DROP CONSTRAINT temperatures_pkey;
+ALTER TABLE ONLY public.regions DROP CONSTRAINT regions_pkey;
+ALTER TABLE ONLY public.precipitations DROP CONSTRAINT precipitations_pkey;
+ALTER TABLE ONLY public.massifs DROP CONSTRAINT massifs_pkey;
+ALTER TABLE ONLY public.lieux DROP CONSTRAINT lieux_pkey;
+ALTER TABLE ONLY public.historiques DROP CONSTRAINT historiques_pkey;
+ALTER TABLE ONLY public.historiques DROP CONSTRAINT historiques_capteur_id_fin_key;
+ALTER TABLE ONLY public.departements DROP CONSTRAINT departements_pkey;
+ALTER TABLE ONLY public.departements DROP CONSTRAINT departements_nom_key;
+ALTER TABLE ONLY public.capteurs DROP CONSTRAINT capteurs_pkey;
+ALTER TABLE ONLY public.bulletins DROP CONSTRAINT bulletins_pkey;
+ALTER TABLE ONLY public.bulletins DROP CONSTRAINT bulletins_date_moment_key;
+ALTER TABLE public.vents ALTER COLUMN capteur_id DROP DEFAULT;
+ALTER TABLE public.vents ALTER COLUMN vent_id DROP DEFAULT;
+ALTER TABLE public.temperatures ALTER COLUMN capteur_id DROP DEFAULT;
+ALTER TABLE public.temperatures ALTER COLUMN temperature_id DROP DEFAULT;
+ALTER TABLE public.precipitations ALTER COLUMN capteur_id DROP DEFAULT;
+ALTER TABLE public.precipitations ALTER COLUMN precipitation_id DROP DEFAULT;
+ALTER TABLE public.historiques ALTER COLUMN capteur_id DROP DEFAULT;
+ALTER TABLE public.capteurs ALTER COLUMN capteur_id DROP DEFAULT;
+ALTER TABLE public.bulletins ALTER COLUMN vent_id DROP DEFAULT;
+ALTER TABLE public.bulletins ALTER COLUMN temperature_id DROP DEFAULT;
+ALTER TABLE public.bulletins ALTER COLUMN precipitation_id DROP DEFAULT;
+ALTER TABLE public.bulletins ALTER COLUMN bulletin_id DROP DEFAULT;
+DROP VIEW public.vville;
+DROP VIEW public.vmassif;
+DROP TABLE public.villes;
+DROP SEQUENCE public.vents_vent_id_seq;
+DROP SEQUENCE public.vents_capteur_id_seq;
+DROP TABLE public.vents;
+DROP SEQUENCE public.temperatures_temperature_id_seq;
+DROP SEQUENCE public.temperatures_capteur_id_seq;
+DROP TABLE public.temperatures;
+DROP TABLE public.regions;
+DROP SEQUENCE public.precipitations_precipitation_id_seq;
+DROP SEQUENCE public.precipitations_capteur_id_seq;
+DROP TABLE public.precipitations;
+DROP TABLE public.massifs;
+DROP TABLE public.lieux;
+DROP SEQUENCE public.historiques_capteur_id_seq;
+DROP TABLE public.historiques;
+DROP TABLE public.departements;
+DROP SEQUENCE public.capteurs_capteur_id_seq;
+DROP TABLE public.capteurs;
+DROP SEQUENCE public.bulletins_vent_id_seq;
+DROP SEQUENCE public.bulletins_temperature_id_seq;
+DROP SEQUENCE public.bulletins_precipitation_id_seq;
+DROP SEQUENCE public.bulletins_bulletin_id_seq;
+DROP TABLE public.bulletins;
+DROP FUNCTION public.process_update_capteur();
+DROP FUNCTION public.process_insert_capteur();
+DROP EXTENSION plpgsql;
+DROP SCHEMA public;
 --
 -- Name: nf17; Type: COMMENT; Schema: -; Owner: postgres
 --
 
 COMMENT ON DATABASE nf17 IS 'Base de données pour le projet NF17 sur les bulletins météo.';
+
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO postgres;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
 
 
 --
@@ -612,12 +703,10 @@ ALTER TABLE ONLY vents ALTER COLUMN capteur_id SET DEFAULT nextval('vents_capteu
 -- Data for Name: bulletins; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY bulletins (bulletin_id, lieu_id, moment, date, precipitation_id, temperature_id, vent_id) FROM stdin;
-16	Toulouse	Matin	2012-09-30 00:00:00	56	22	\N
-18	Bordeaux	Après-midi	2012-09-30 00:00:00	58	24	34
-19	Bordeaux	Soirée	2012-09-30 00:00:00	\N	25	35
-20	Bordeaux	Nuit	2012-09-30 00:00:00	\N	26	\N
-\.
+INSERT INTO bulletins VALUES (16, 'Toulouse', 'Matin', '2012-09-30 00:00:00', 56, 22, NULL);
+INSERT INTO bulletins VALUES (18, 'Bordeaux', 'Après-midi', '2012-09-30 00:00:00', 58, 24, 34);
+INSERT INTO bulletins VALUES (19, 'Bordeaux', 'Soirée', '2012-09-30 00:00:00', NULL, 25, 35);
+INSERT INTO bulletins VALUES (20, 'Bordeaux', 'Nuit', '2012-09-30 00:00:00', NULL, 26, NULL);
 
 
 --
@@ -652,11 +741,9 @@ SELECT pg_catalog.setval('bulletins_vent_id_seq', 1, false);
 -- Data for Name: capteurs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY capteurs (capteur_id, lieu_id) FROM stdin;
-58	Toulouse
-57	Toulouse
-56	Bordeaux
-\.
+INSERT INTO capteurs VALUES (58, 'Toulouse');
+INSERT INTO capteurs VALUES (57, 'Toulouse');
+INSERT INTO capteurs VALUES (56, 'Bordeaux');
 
 
 --
@@ -670,121 +757,117 @@ SELECT pg_catalog.setval('capteurs_capteur_id_seq', 58, true);
 -- Data for Name: departements; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY departements (departement_id, nom, region_id) FROM stdin;
-1	Ain	22
-2	Aisne	19
-3	Allier	2
-5	Alpes (Hautes)	21
-6	Alpes Maritimes	21
-7	Ardéche	22
-8	Ardennes	6
-9	 Ariége	14
-10	Aube	6
-11	Aude	11
-12	Aveyron	14
-13	Bouches du Rhône	21
-15	Cantal	2
-16	Charente	20
-17	Charente Maritime	20
-18	Cher	5
-19	Corréze	12
-23	Creuse 	12
-24	Dordogne	1
-25	Doubs	9
-26	Drôme	22
-27	Eure	17
-28	Eure et Loir	5
-29	Finistére	4
-30	Gard	11
-31	Garonne (Haute)	14
-32	Gers	14
-33	Gironde	1
-34	Hérault	11
-35	Ile et Vilaine	4
-36	Indre	5
-37	Indre et Loire	5
-38	Isére	22
-39	Jura	9
-40	Landes	1
-41	Loir et Cher	5
-42	Loire	22
-43	Loire (Haute)	2
-44	Loire Atlantique	18
-45	Loiret	5
-46	Lot	14
-47	Lot et Garonne	1
-48	Lozére	11
-49	Maine et Loire	18
-51	Marne	6
-52	Marne (Haute)	6
-53	Mayenne	18
-54	Meurthe et Moselle	13
-55	Meuse	13
-56	Morbihan	4
-57	Moselle	13
-58	Niévre	3
-59	Nord	15
-60	Oise	19
-62	Pas de Calais	15
-63	Puy de Dôme	2
-64	Pyrénées Atlantiques	1
-65	Pyrénées (Hautes)	14
-66	Pyrénées Orientales	11
-69	Rhône	22
-70	Saône (Haute)	9
-71	Saône et Loire	3
-72	Sarthe	18
-73	Savoie	22
-74	Savoie (Haute)	22
-75	Paris	10
-76	Seine Maritime	17
-77	Seine et Marne	10
-78	Yvelines	10
-79	Sèvres (Deux)	20
-80	Somme	19
-81	Tarn	14
-82	Tarn et Garonne	14
-83	Var	21
-84	Vaucluse	21
-85	Vendée	18
-86	Vienne	20
-87	Vienne (Haute)	12
-88	Vosges	13
-89	Yonne	3
-90	Belfort (Territoire de)	9
-91	Essonne	10
-92	Hauts de Seine	10
-93	Seine Saint Denis	10
-94	Val de Marne	10
-976	Mayotte	8
-971	Guadeloupe	8
-973	Guyane	8
-972	Martinique	8
-974	Réunion	8
-21	Côte d'or	3
-22	Côtes d'armor	4
-95	Val d'oise	10
-\.
+INSERT INTO departements VALUES (1, 'Ain', '22');
+INSERT INTO departements VALUES (2, 'Aisne', '19');
+INSERT INTO departements VALUES (3, 'Allier', '2');
+INSERT INTO departements VALUES (5, 'Alpes (Hautes)', '21');
+INSERT INTO departements VALUES (6, 'Alpes Maritimes', '21');
+INSERT INTO departements VALUES (7, 'Ardéche', '22');
+INSERT INTO departements VALUES (8, 'Ardennes', '6');
+INSERT INTO departements VALUES (9, ' Ariége', '14');
+INSERT INTO departements VALUES (10, 'Aube', '6');
+INSERT INTO departements VALUES (11, 'Aude', '11');
+INSERT INTO departements VALUES (12, 'Aveyron', '14');
+INSERT INTO departements VALUES (13, 'Bouches du Rhône', '21');
+INSERT INTO departements VALUES (15, 'Cantal', '2');
+INSERT INTO departements VALUES (16, 'Charente', '20');
+INSERT INTO departements VALUES (17, 'Charente Maritime', '20');
+INSERT INTO departements VALUES (18, 'Cher', '5');
+INSERT INTO departements VALUES (19, 'Corréze', '12');
+INSERT INTO departements VALUES (23, 'Creuse ', '12');
+INSERT INTO departements VALUES (24, 'Dordogne', '1');
+INSERT INTO departements VALUES (25, 'Doubs', '9');
+INSERT INTO departements VALUES (26, 'Drôme', '22');
+INSERT INTO departements VALUES (27, 'Eure', '17');
+INSERT INTO departements VALUES (28, 'Eure et Loir', '5');
+INSERT INTO departements VALUES (29, 'Finistére', '4');
+INSERT INTO departements VALUES (30, 'Gard', '11');
+INSERT INTO departements VALUES (31, 'Garonne (Haute)', '14');
+INSERT INTO departements VALUES (32, 'Gers', '14');
+INSERT INTO departements VALUES (33, 'Gironde', '1');
+INSERT INTO departements VALUES (34, 'Hérault', '11');
+INSERT INTO departements VALUES (35, 'Ile et Vilaine', '4');
+INSERT INTO departements VALUES (36, 'Indre', '5');
+INSERT INTO departements VALUES (37, 'Indre et Loire', '5');
+INSERT INTO departements VALUES (38, 'Isére', '22');
+INSERT INTO departements VALUES (39, 'Jura', '9');
+INSERT INTO departements VALUES (40, 'Landes', '1');
+INSERT INTO departements VALUES (41, 'Loir et Cher', '5');
+INSERT INTO departements VALUES (42, 'Loire', '22');
+INSERT INTO departements VALUES (43, 'Loire (Haute)', '2');
+INSERT INTO departements VALUES (44, 'Loire Atlantique', '18');
+INSERT INTO departements VALUES (45, 'Loiret', '5');
+INSERT INTO departements VALUES (46, 'Lot', '14');
+INSERT INTO departements VALUES (47, 'Lot et Garonne', '1');
+INSERT INTO departements VALUES (48, 'Lozére', '11');
+INSERT INTO departements VALUES (49, 'Maine et Loire', '18');
+INSERT INTO departements VALUES (51, 'Marne', '6');
+INSERT INTO departements VALUES (52, 'Marne (Haute)', '6');
+INSERT INTO departements VALUES (53, 'Mayenne', '18');
+INSERT INTO departements VALUES (54, 'Meurthe et Moselle', '13');
+INSERT INTO departements VALUES (55, 'Meuse', '13');
+INSERT INTO departements VALUES (56, 'Morbihan', '4');
+INSERT INTO departements VALUES (57, 'Moselle', '13');
+INSERT INTO departements VALUES (58, 'Niévre', '3');
+INSERT INTO departements VALUES (59, 'Nord', '15');
+INSERT INTO departements VALUES (60, 'Oise', '19');
+INSERT INTO departements VALUES (62, 'Pas de Calais', '15');
+INSERT INTO departements VALUES (63, 'Puy de Dôme', '2');
+INSERT INTO departements VALUES (64, 'Pyrénées Atlantiques', '1');
+INSERT INTO departements VALUES (65, 'Pyrénées (Hautes)', '14');
+INSERT INTO departements VALUES (66, 'Pyrénées Orientales', '11');
+INSERT INTO departements VALUES (69, 'Rhône', '22');
+INSERT INTO departements VALUES (70, 'Saône (Haute)', '9');
+INSERT INTO departements VALUES (71, 'Saône et Loire', '3');
+INSERT INTO departements VALUES (72, 'Sarthe', '18');
+INSERT INTO departements VALUES (73, 'Savoie', '22');
+INSERT INTO departements VALUES (74, 'Savoie (Haute)', '22');
+INSERT INTO departements VALUES (75, 'Paris', '10');
+INSERT INTO departements VALUES (76, 'Seine Maritime', '17');
+INSERT INTO departements VALUES (77, 'Seine et Marne', '10');
+INSERT INTO departements VALUES (78, 'Yvelines', '10');
+INSERT INTO departements VALUES (79, 'Sèvres (Deux)', '20');
+INSERT INTO departements VALUES (80, 'Somme', '19');
+INSERT INTO departements VALUES (81, 'Tarn', '14');
+INSERT INTO departements VALUES (82, 'Tarn et Garonne', '14');
+INSERT INTO departements VALUES (83, 'Var', '21');
+INSERT INTO departements VALUES (84, 'Vaucluse', '21');
+INSERT INTO departements VALUES (85, 'Vendée', '18');
+INSERT INTO departements VALUES (86, 'Vienne', '20');
+INSERT INTO departements VALUES (87, 'Vienne (Haute)', '12');
+INSERT INTO departements VALUES (88, 'Vosges', '13');
+INSERT INTO departements VALUES (89, 'Yonne', '3');
+INSERT INTO departements VALUES (90, 'Belfort (Territoire de)', '9');
+INSERT INTO departements VALUES (91, 'Essonne', '10');
+INSERT INTO departements VALUES (92, 'Hauts de Seine', '10');
+INSERT INTO departements VALUES (93, 'Seine Saint Denis', '10');
+INSERT INTO departements VALUES (94, 'Val de Marne', '10');
+INSERT INTO departements VALUES (976, 'Mayotte', '8');
+INSERT INTO departements VALUES (971, 'Guadeloupe', '8');
+INSERT INTO departements VALUES (973, 'Guyane', '8');
+INSERT INTO departements VALUES (972, 'Martinique', '8');
+INSERT INTO departements VALUES (974, 'Réunion', '8');
+INSERT INTO departements VALUES (21, 'Côte d''or', '3');
+INSERT INTO departements VALUES (22, 'Côtes d''armor', '4');
+INSERT INTO departements VALUES (95, 'Val d''oise', '10');
 
 
 --
 -- Data for Name: historiques; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY historiques (capteur_id, debut, lieu_id, fin) FROM stdin;
-58	2013-05-31 14:38:13.772	Toulouse	2013-05-31 15:55:06.141
-58	2013-05-31 15:55:06.141	Bordeaux	2013-05-31 15:57:03.939
-58	2013-05-31 15:57:03.939	Toulouse	\N
-57	2013-05-31 16:07:26.547	Bordeaux	2013-05-31 16:08:54.817
-57	2013-05-31 16:08:54.817	Toulouse	2013-05-31 16:09:10.439
-57	2013-06-03 15:22:42.348	Toulouse	\N
-56	2013-06-03 22:59:07.965	Bordeaux	2013-06-03 23:02:26.866
-56	2013-05-31 15:59:11.272	Toulouse	2013-06-03 23:04:23.974
-56	2013-06-03 23:27:08.628	Toulouse	2013-06-03 23:30:45.44
-56	2013-06-03 23:30:45.44	Bordeaux	2013-06-03 23:31:01.63
-56	2013-06-03 23:31:32.096	Toulouse	2013-06-03 23:31:46.711
-56	2013-06-03 23:31:46.711	Bordeaux	\N
-\.
+INSERT INTO historiques VALUES (58, '2013-05-31 14:38:13.772', 'Toulouse', '2013-05-31 15:55:06.141');
+INSERT INTO historiques VALUES (58, '2013-05-31 15:55:06.141', 'Bordeaux', '2013-05-31 15:57:03.939');
+INSERT INTO historiques VALUES (58, '2013-05-31 15:57:03.939', 'Toulouse', NULL);
+INSERT INTO historiques VALUES (57, '2013-05-31 16:07:26.547', 'Bordeaux', '2013-05-31 16:08:54.817');
+INSERT INTO historiques VALUES (57, '2013-05-31 16:08:54.817', 'Toulouse', '2013-05-31 16:09:10.439');
+INSERT INTO historiques VALUES (57, '2013-06-03 15:22:42.348', 'Toulouse', NULL);
+INSERT INTO historiques VALUES (56, '2013-06-03 22:59:07.965', 'Bordeaux', '2013-06-03 23:02:26.866');
+INSERT INTO historiques VALUES (56, '2013-05-31 15:59:11.272', 'Toulouse', '2013-06-03 23:04:23.974');
+INSERT INTO historiques VALUES (56, '2013-06-03 23:27:08.628', 'Toulouse', '2013-06-03 23:30:45.44');
+INSERT INTO historiques VALUES (56, '2013-06-03 23:30:45.44', 'Bordeaux', '2013-06-03 23:31:01.63');
+INSERT INTO historiques VALUES (56, '2013-06-03 23:31:32.096', 'Toulouse', '2013-06-03 23:31:46.711');
+INSERT INTO historiques VALUES (56, '2013-06-03 23:31:46.711', 'Bordeaux', NULL);
 
 
 --
@@ -798,30 +881,26 @@ SELECT pg_catalog.setval('historiques_capteur_id_seq', 1, false);
 -- Data for Name: lieux; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY lieux (nom, seuiltp, seuilvt, seuilpr) FROM stdin;
-Toulouse	45	6	8
-Bordeaux	40	10	10
-\.
+INSERT INTO lieux VALUES ('Toulouse', 45, 6, 8);
+INSERT INTO lieux VALUES ('Bordeaux', 40, 10, 10);
 
 
 --
 -- Data for Name: massifs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY massifs (nom, d1, d2) FROM stdin;
-Bordeaux	1	9
-\.
+INSERT INTO massifs VALUES ('Bordeaux', 1, 9);
 
 
 --
 -- Data for Name: precipitations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY precipitations (precipitation_id, type, seuil, force, info, capteur_id) FROM stdin;
-55	Pluie	10	10	zeffijzefefhefhzefezifhef 	58
-56	Pluie	10	10	zeffijzefefhefhzefezifhef\t\t\t\t\r\n\t\t\t\t\t\t 	58
-58	Pluie	10	10	zeffijzefefhefhzefezifhef\t\t\t\t\r\n\t\t\t\t\t\t 	56
-\.
+INSERT INTO precipitations VALUES (55, 'Pluie', 10, 10, 'zeffijzefefhefhzefezifhef ', 58);
+INSERT INTO precipitations VALUES (56, 'Pluie', 10, 10, 'zeffijzefefhefhzefezifhef				
+						 ', 58);
+INSERT INTO precipitations VALUES (58, 'Pluie', 10, 10, 'zeffijzefefhefhzefezifhef				
+						 ', 56);
 
 
 --
@@ -842,43 +921,39 @@ SELECT pg_catalog.setval('precipitations_precipitation_id_seq', 58, true);
 -- Data for Name: regions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY regions (num, nom) FROM stdin;
-1	Alsace
-10	Franche Comte
-11	Haute Normandie
-12	Ile de France
-13	Languedoc Roussillon
-14	Limousin
-15	Lorraine
-16	Midi-Pyrénées
-17	Nord Pas de Calais
-18	Provence Alpes Côte d'Azur
-19	Pays de la Loire
-2	Aquitaine
-20	Picardie
-21	Poitou Charente
-22	Rhone Alpes
-3	Auvergne
-4	Basse Normandie
-5	Bourgogne
-6	Bretagne
-7	Centre
-8	Champagne Ardenne
-9	Corse
-\.
+INSERT INTO regions VALUES ('1', 'Alsace');
+INSERT INTO regions VALUES ('10', 'Franche Comte');
+INSERT INTO regions VALUES ('11', 'Haute Normandie');
+INSERT INTO regions VALUES ('12', 'Ile de France');
+INSERT INTO regions VALUES ('13', 'Languedoc Roussillon');
+INSERT INTO regions VALUES ('14', 'Limousin');
+INSERT INTO regions VALUES ('15', 'Lorraine');
+INSERT INTO regions VALUES ('16', 'Midi-Pyrénées');
+INSERT INTO regions VALUES ('17', 'Nord Pas de Calais');
+INSERT INTO regions VALUES ('18', 'Provence Alpes Côte d''Azur');
+INSERT INTO regions VALUES ('19', 'Pays de la Loire');
+INSERT INTO regions VALUES ('2', 'Aquitaine');
+INSERT INTO regions VALUES ('20', 'Picardie');
+INSERT INTO regions VALUES ('21', 'Poitou Charente');
+INSERT INTO regions VALUES ('22', 'Rhone Alpes');
+INSERT INTO regions VALUES ('3', 'Auvergne');
+INSERT INTO regions VALUES ('4', 'Basse Normandie');
+INSERT INTO regions VALUES ('5', 'Bourgogne');
+INSERT INTO regions VALUES ('6', 'Bretagne');
+INSERT INTO regions VALUES ('7', 'Centre');
+INSERT INTO regions VALUES ('8', 'Champagne Ardenne');
+INSERT INTO regions VALUES ('9', 'Corse');
 
 
 --
 -- Data for Name: temperatures; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY temperatures (temperature_id, reelle, ressentie, seuil, info, capteur_id) FROM stdin;
-21	15	20	25	frgrgeergregregregregregregrgrgerg 	58
-22	15	20	25	frgrgeergregregregregregregrgrgerg\t\t\t\t 	58
-24	15	20	25	frgrgeergregregregregregregrgrgerg\t\t\t\t 	56
-25	15	20	25	frgrgeergregregregregregregrgrgerg\t\t\t\t 	56
-26	15	20	25	frgrgeergregregregregregregrgrgerg\t\t\t\t 	56
-\.
+INSERT INTO temperatures VALUES (21, 15, 20, 25, 'frgrgeergregregregregregregrgrgerg ', 58);
+INSERT INTO temperatures VALUES (22, 15, 20, 25, 'frgrgeergregregregregregregrgrgerg				 ', 58);
+INSERT INTO temperatures VALUES (24, 15, 20, 25, 'frgrgeergregregregregregregrgrgerg				 ', 56);
+INSERT INTO temperatures VALUES (25, 15, 20, 25, 'frgrgeergregregregregregregrgrgerg				 ', 56);
+INSERT INTO temperatures VALUES (26, 15, 20, 25, 'frgrgeergregregregregregregrgrgerg				 ', 56);
 
 
 --
@@ -899,10 +974,8 @@ SELECT pg_catalog.setval('temperatures_temperature_id_seq', 26, true);
 -- Data for Name: vents; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY vents (vent_id, force, direction, seuil, info, capteur_id) FROM stdin;
-34	4	Nord	8	rezdfbzefgezufgzeufgezfuigefyugezfg\t\t\t\t 	56
-35	4	Nord	8	rezdfbzefgezufgzeufgezfuigefyugezfg\t\t\t\t 	56
-\.
+INSERT INTO vents VALUES (34, 4, 'Nord', 8, 'rezdfbzefgezufgzeufgezfuigefyugezfg				 ', 56);
+INSERT INTO vents VALUES (35, 4, 'Nord', 8, 'rezdfbzefgezufgzeufgezfuigefyugezfg				 ', 56);
 
 
 --
@@ -923,9 +996,7 @@ SELECT pg_catalog.setval('vents_vent_id_seq', 35, true);
 -- Data for Name: villes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY villes (nom, dpt) FROM stdin;
-Toulouse	31
-\.
+INSERT INTO villes VALUES ('Toulouse', 31);
 
 
 --
