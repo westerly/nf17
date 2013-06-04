@@ -8,7 +8,7 @@
 		include("./html_form.php");
 		
 		// Ajout d'un bulletin en BD
-		if($_GET["action"] == "add"){
+		if(isset($_GET["action"]) && $_GET["action"] == "add"){
 			
 			// Afficher form d'ajout
 			if(!isset($_POST["jour"])){
@@ -250,8 +250,102 @@
 			}
 			
 		}
-		
 		?>
+		
+		<?php if(isset($_GET["action"]) && $_GET["action"] == "search"){?>
+			<?php if(isset($_GET["etape"]) && $_GET["etape"] == "1"){?>
+			
+			<form action='./bulletins.php?action=search&etape=2' method='POST'>
+				Choisir un lieu:
+				<?php echo getListeLieux("lieu");?>
+				</br>
+				<input type='submit' value='Envoyer' />
+			</form>
+		
+			<?php 
+		
+				}else{
+					if(isset($_GET["etape"]) && $_GET["etape"] == "2"){ ?>
+						
+						<form action='./bulletins.php?action=search&etape=3' method='POST'>
+							<input type = "hidden" name="lieu" value="<?php echo $_POST["lieu"];?>" />
+							<?php 						
+								echo getListeDatesBulletinsFromLieu("date", $_POST["lieu"]);						
+							?>
+							<input type='submit' value='Envoyer' />
+						</form>
+					
+					<?php 
+
+
+					}else{
+						// Affichage des bulletins
+						if(isset($_GET["etape"]) && $_GET["etape"] == "3"){
+							
+							$bulletins = getBulletinsRowsFromLieuAndDate($_POST["lieu"], $_POST["date"]);
+							
+							//var_dump($bulletins);
+							if(count($bulletins)!=0){
+
+								$i = 1;
+								foreach($bulletins as $b){
+									echo "<b>Bulletin numéro ".$i++." : </b>";
+									echo"<table style='border:1px solid black'>";
+										echo "<tr><th>Moment</th></tr>";
+										echo"<tr>";
+											echo "<td>".$b['moment']."</td>";
+										echo"</tr>";
+									echo"</table>";
+									echo"</br>";
+									
+									if(isset($b["type"])){
+										echo "Precipitations: ";
+										echo"<table style='border:1px solid black'>";
+											echo "<tr style='border:1px'><th>Type</th><th>Seuil</th><th>Force</th><th>Infos</th><th>Capteur Id</th></tr>";
+											echo"<tr>";
+											echo "<td>".$b['type']."</td><td>".$b['seuilp']."</td><td>".$b['forcep']."</td><td>".$b['infop']."</td><td>".$b['capteurp']."</td>";
+											echo"</tr>";
+										echo"</table>";
+										echo"</br>";
+									}
+									
+									if(isset($b["reelle"])){
+										echo "Températures: ";
+										echo"<table style='border:1px solid black'>";
+										echo "<tr><th>Reelle</th><th>Ressentie</th><th>Seuil</th><th>Infos</th><th>Capteur Id</th></tr>";
+										echo"<tr>";
+										echo "<td>".$b['reelle']."</td><td>".$b['ressentie']."</td><td>".$b['seuilt']."</td><td>".$b['infot']."</td><td>".$b['capteurt']."</td>";
+										echo"</tr>";
+										echo"</table>";
+										echo"</br>";
+									}
+									
+									if(isset($b["forcev"])){
+										echo "Vents: ";
+										echo"<table style='border:1px solid black'>";
+										echo "<tr><th>Force</th><th>Direction</th><th>Seuil</th><th>Infos</th><th>Capteur Id</th></tr>";
+										echo"<tr>";
+										echo "<td>".$b['forcev']."</td><td>".$b['direction']."</td><td>".$b['seuilv']."</td><td>".$b['infov']."</td><td>".$b['capteurv']."</td>";
+										echo"</tr>";
+										echo"</table>";
+										echo"</br>";
+									}
+								}
+							}else{
+								echo "Aucun bulletin disponible.";
+							}
+							
+						}
+
+					}
+
+				} 
+			
+	
+
+		} ?>
+		
+		
 	
 	
 	</body>
