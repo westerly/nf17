@@ -97,6 +97,42 @@ function getLieuIdFromCapteurId($id){
 	
 }
 
+function getListeDatesBulletinsFromLieu($name, $lieu){
+	include("./connect.php");
+	$list="<select name='".$name."' id = '".$name."'>";
+	
+	
+	$sql = "SELECT distinct date FROM bulletins WHERE lieu_id = '".$lieu."';";
+	foreach ($db->query($sql) as $row)
+	{
+		
+		$formatedDate = date("d-m-Y", strtotime($row['date']));
+		$list.= "<option value='".$formatedDate."'>".$formatedDate."</option>";
+	}
+	$list.= "</select>";
+	return $list;
+}
+
+function getBulletinsRowsFromLieuAndDate($lieu, $date){
+	include("./connect.php");
+	
+	$sql = "select b.moment, b.date, p.type, p.seuil as seuilp, p.force as forcep,
+	p.info as infop, p.capteur_id as capteurP, t.reelle, t.ressentie,
+	t.seuil as seuilt, t.info as infot, t.capteur_id as capteurt, 
+	v.force as forcev, v.direction, v.seuil as seuilv, v.info as infov, v.capteur_id as capteurv from bulletins b 
+	LEFT JOIN precipitations p ON b.precipitation_id = p.precipitation_id
+	LEFT JOIN temperatures t ON b.temperature_id = t.temperature_id
+	LEFT JOIN vents v ON b.vent_id = v.vent_id WHERE date = '".$date."' AND lieu_id='".$lieu."';";
+		
+	$sth = $db->prepare($sql);
+	$sth->execute();
+	$res = $sth->fetchAll();
+	
+	return $res;
+	
+	
+}
+
 
 
 
