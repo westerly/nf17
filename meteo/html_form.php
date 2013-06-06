@@ -130,6 +130,18 @@ function getBulletinsRowsFromLieuAndDate($lieu, $date){
 	
 }
 
+function getrowsHistoriqueCapteur($capteur){
+	include("./connect.php");
+	
+	$sql = "select * from historiques where capteur_id = ".$capteur." order by debut";
+	
+	$sth = $db->prepare($sql);
+	$sth->execute();
+	$res = $sth->fetchAll();
+	
+	return $res;
+}
+
 
 
 

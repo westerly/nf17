@@ -113,6 +113,49 @@
 					echo "<input type='submit' value='Envoyer' />";
 					echo"</form>";
 
+				}else{
+					if(isset($_GET["action"])  && $_GET["action"] == "historique")
+					{
+						if(isset($_GET["etape"])  && $_GET["etape"] == "1"){
+							echo"<form action='./capteurs.php?action=historique&etape=2 ' method='POST'>";
+							// On peut créer un capteur sans l'affecter à un lieu
+							echo "Choisir un capteur: ".getListeCapteurs("capteur",false);
+								
+							echo "</br>";
+							echo "<input type='submit' value='Envoyer' />";
+							echo"</form>";
+							
+						}else{
+							if(isset($_GET["etape"])  && $_GET["etape"] == "2"){
+								
+								$histo = getrowsHistoriqueCapteur($_POST["capteur"]);
+								
+								if(count($histo)!=0){
+									echo"<table style='border:1px solid black'>";
+									echo"<th>Lieu d'affectation</th><th>Date de début d'affectation</th><th>Date de fin d'affectation</th>";
+									foreach($histo as $ligne){
+										$formatedDateDebut=null;
+										$formatedDateFin=null;
+										
+										if(isset($ligne['debut'])){
+											$formatedDateDebut = date("d-m-Y H:i", strtotime($ligne['debut']));
+										}
+										if(isset($ligne['fin'])){
+											$formatedDateFin = date("d-m-Y H:i", strtotime($ligne['fin']));
+										}
+										
+										echo"<tr><td>".$ligne["lieu_id"]."</td><td>".$formatedDateDebut."</td><td>".$formatedDateFin."</td></tr>";
+									}
+									
+									echo"</table>";
+									
+								}else{
+									echo "Pas d'historique disponible pour ce capteur.";
+								}
+								
+							}
+						}
+					}
 				}
 
 			}

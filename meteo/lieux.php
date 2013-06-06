@@ -139,6 +139,19 @@ if(isset($_GET["action"]) && $_GET["action"] == "add"){
 			}
 		}
  	}
+}else{
+	if(isset($_GET["action"]) && $_GET["action"] == "rechercher"){
+		
+		if(isset($_POST["date1"])){
+			
+			echo "Afficher les lieux";
+		}else{
+			
+			echo "Afficher le form";
+		}
+	}
+
+
 }
 
 
