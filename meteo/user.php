@@ -30,4 +30,9 @@
 			header("Location: index.php");
 	}
 
+
 ?>
+
+<br>
+<br>
+<a href=".">Acceuil</a>

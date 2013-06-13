@@ -21,8 +21,8 @@
 			<?php }else{ ?>
 	<p>
 		<form action="user.php?action=connect" method="POST">
-			Login: <input type=text name = "login"/>
-			Mot de passe: <input type=text name = "mdp"/>
+			Login: <input type="text" name = "login"/>
+			Mot de passe: <input type="password" name = "mdp"/>
 			<input type="submit" value="Connexion"/>
 		</form>
 	</p>
