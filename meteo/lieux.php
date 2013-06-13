@@ -1,6 +1,6 @@
 <html>
 	<head>
-	<?php include("./head.html")?>
+	<?php include("./head.php")?>
 	<style>
 		th {
 			border-width:1px; 
@@ -19,6 +19,12 @@
 	<body>
 
 	<?php if (isset($_GET["action"])) {
+		
+		if(!isset($_SESSION["userCo"]) && in_array($_GET["action"], array ("delete", "add"))){
+			echo "Vous devez être connecté pour utiliser cette fonction.";
+			goto end;
+		}
+		
 		// Ajout d'un lieu en BD
 		if ($_GET["action"] == "add") {
 			include("./html_form.php");
@@ -128,7 +134,6 @@
 						} else {
 							print "Enregistrement effectué avec succès.";
 							print"</br>";
-							print "<a href='./index.html'>Accueil </a>";
 							
 						}
 					} else {
@@ -149,7 +154,6 @@
 						} else {
 							print "Enregistrement du lieu effectué avec succès.";
 							print"</br>";
-							print "<a href='./index.html'>Accueil </a>";
 							
 						}
 					}
@@ -177,7 +181,6 @@
 					</form></tr>
 				<?php endforeach;?>
 				</table>
-				<a href=".">Acceuil</a>
 				<?php 
 			} else {
 				$sql = "DELETE FROM lieux WHERE nom LIKE '".$_POST['nom']."'";
@@ -505,6 +508,8 @@
 
 
 	}
+	
+	end:
 	?>
 	<br>
 	<br>

@@ -1,5 +1,5 @@
 <?php
-	include("head.html");
+	include("head.php");
 	include("connect.php");
 	if(isset($_POST['check'])) {
 		// recuperation de la liste de lieu

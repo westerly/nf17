@@ -1,5 +1,5 @@
 <?php 
-include("head.html");
+include("head.php");
 include("connect.php"); ?>
 <html>
 	<head>

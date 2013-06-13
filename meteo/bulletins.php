@@ -1,11 +1,17 @@
 <html>
-<?php include("./head.html")?>
+<?php include("./head.php")?>
 
 	<body>
 		
 		<?php 
 		
 		include("./html_form.php");
+		
+		
+		if(isset($_GET["action"]) && !isset($_SESSION["userCo"]) && in_array($_GET["action"], array ("add"))){
+			echo "Vous devez être connecté pour utiliser cette fonction.";
+			goto end;
+		}
 		
 		// Ajout d'un bulletin en BD
 		if(isset($_GET["action"]) && $_GET["action"] == "add"){
@@ -340,7 +346,14 @@
 			
 	
 
-		} ?>
+		}
+
+		end:
+		?>
+		
+		</br>
+		</br>
+		<a href=".">Acceuil</a>
 		
 		
 	

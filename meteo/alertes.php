@@ -1,6 +1,6 @@
 <?php 
 include('connect.php');
-include('head.html');
+include('head.php');
 ?>
 <html>
 	<head>

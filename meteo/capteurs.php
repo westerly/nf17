@@ -1,5 +1,5 @@
 <html>
-<?php include("./head.html")?>
+<?php include("./head.php")?>
 
 	<body>
 		
@@ -9,6 +9,13 @@
 		
 		// Ajout d'un bulletin en BD
 		if (isset($_GET["action"])) {
+			
+			if(!isset($_SESSION["userCo"]) && in_array($_GET["action"], array ("update", "add"))){
+				echo "Vous devez être connecté pour utiliser cette fonction.";
+				goto end;
+			}
+			
+			
 			if ($_GET["action"] == "add") {
 				// Afficher form d'ajout
 				if (!isset($_POST["lieu"])) { ?>
@@ -43,7 +50,7 @@
 					} else {
 						print "Enregistrement du capteur effectué avec succès.";
 						print"</br>";
-						print "<a href='./index.html'>Accueil </a>";
+						print "<a href='./index.php'>Accueil </a>";
 					}
 			
 				}
@@ -94,7 +101,7 @@
 						}else{
 							print "La nouvelle affectation du capteur a été effectuée avec succès.";
 							print"</br>";
-							print "<a href='./index.html'>Accueil </a>";
+							print "<a href='./index.php'>Accueil </a>";
 						}
 					
 					}
@@ -148,6 +155,8 @@
 				}
 			}
 		}
+		
+		end:
 		?>
 	<br>
 	<br>
