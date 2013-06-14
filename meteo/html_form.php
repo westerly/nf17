@@ -81,7 +81,7 @@ function getListeEnum($name, $enum, $empty=false){
 
 
 function getInputDate(){
-	return "<input type='number' name='jour' min='2' max='2'/> <input type='number' name='mois' min='2' max='2'/><input type='number' name='annee' min='4' max='4'/>";
+	return "<input type='text' name='jour'/> <input type='text' name='mois'/><input type='text' name='annee'/>";
 }
 
 function getLieuIdFromCapteurId($id){

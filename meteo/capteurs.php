@@ -1,5 +1,21 @@
 <html>
-<?php include("./head.php")?>
+	<head>
+	<?php include("./head.php")?>
+	<style>
+		th {
+			border-width:1px; 
+			border-style:solid; 
+			border-color:black;
+		}
+		
+		table { 
+			border-width:1px;
+			border-style:solid; 
+			border-color:black;
+			text-align:center;
+		}
+	</style>
+	</head>
 
 	<body>
 		
@@ -79,15 +95,15 @@
 							<input type='submit' value='Envoyer' />
 						</form>
 					<?php
-					//Ajouter
 					} else {
 						
 						include("./connect.php");
 						
-						$sql = "INSERT INTO capteurs (lieu_id) VALUES(";
+						$sql = "UPDATE capteurs SET lieu_id = ";
 						
-						$_POST['lieu']=='0'?$sql.='null'.");":$sql.="'".$_POST['lieu']."');";
-														
+						$_POST['lieu']=='0'?$sql.="null":$sql.="'".$_POST['lieu']."'";
+						
+						$sql .= " WHERE capteur_id = '".$_GET['id']."';";
 						$stmt = $db->prepare($sql);
 
 						$stmt->execute();
@@ -153,6 +169,18 @@
 						}
 					}
 				}
+			} else if($_GET["action"] == "view") {
+				include("./connect.php");
+				$sql = "Select * FROM capteurs;";
+				
+				$stmt = $db->prepare($sql);
+				$stmt->execute();
+				$rows = $stmt->fetchAll();
+				echo "<table><tr><th>Capteur</th><th>Lieu</th></tr>";
+				foreach ($rows as $row) {
+					echo "<tr><td>".$row['capteur_id']."</td><td>".$row['lieu_id']."</td></tr>";
+				}
+				echo "</table>";
 			}
 		}
 		

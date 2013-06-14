@@ -1,5 +1,21 @@
 <html>
-<?php include("./head.php")?>
+	<head>
+	<?php include("./head.php")?>
+	<style>
+		th {
+			border-width:1px; 
+			border-style:solid; 
+			border-color:black;
+		}
+		
+		table { 
+			border-width:1px;
+			border-style:solid; 
+			border-color:black;
+			text-align:center;
+		}
+	</style>
+	</head>
 
 	<body>
 		
@@ -28,9 +44,10 @@
 					
 					echo "<br/>";
 					echo "<h1> Précipitation: </h1>";
-					echo "</br> Type de précipitation: ";
+					echo "Type de précipitation: ";
 					echo getListeEnum("typePrecipitation", $enum_types);
 					echo " </br> Seuil précipitation (entre 1 et 10): <input type='text' name='seuilpr'/> </br> Force (entre 1 et 10): <input type='text' name='forcepr'/> </br>";
+					echo "Commentaires: ";
 					
 					echo "</br><textarea name='infopr' rows='4' cols='50'></textarea>";
 						
@@ -38,13 +55,11 @@
 					echo "Capteur ayant enregistré les mesures: ".getListeCapteurs("capteurpr", false, true);
 						
 					
-					echo "<h1> Température:: </h1>";
+					echo "<h1> Température: </h1>";
 					echo "Température réelle: <input type='text' name='reelle'/> </br> Température ressentie: <input type='text' name='ressentie'/>  </br> Seuil température: <input type='text' name='seuiltp'/> </br>";
-					echo "Type de précipitation: ";
+					echo "Commentaires: ";
 					
-					echo "</br> <textarea name='infotp' rows='4' cols='50'>
-				
-						 </textarea>";
+					echo "</br> <textarea name='infotp' rows='4' cols='50'></textarea>";
 						
 					echo "<br/>";
 					echo "Capteur ayant enregistré les mesures: ".getListeCapteurs("capteurtp", false, true);
@@ -54,9 +69,9 @@
 					echo "Direction: ".getListeEnum( "direction", $enum_directions);
 					echo " </br> Seuil vent: <input type='text' name='seuilvt'/> </br> Force: <input type='text' name='forcevt'/>";
 					
-					echo "</br><textarea name='infovt' rows='4' cols='50'>
+					echo "<br>Commentaires: ";
+					echo "</br><textarea name='infovt' rows='4' cols='50'></textarea>";
 				
-						 </textarea>";
 						
 					echo "<br/>";
 					echo "Capteur ayant enregistré les mesures: ".getListeCapteurs("capteurvt", false, true);
