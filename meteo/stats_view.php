@@ -9,12 +9,16 @@
 		switch($_POST['type_lieu']) {
 			// REGION
 			case 'reg':
+				$sql_1 .= "r.nom, ";
 				$sql_2 .= "INNER JOIN vLieuDeptReg ld ON ld.lieu=b.lieu_id ";
+				$sql_2 .= "INNER JOIN regions r ON r.num=ld.region ";
 				$sql_3 .= "ld.region = '".$_POST['reg']."' ";
 				break;
 			// DEPARTEMENT
 			case 'dept':
+				$sql_1 .= "d.nom, ";
 				$sql_2 .= "INNER JOIN vLieuDeptReg ld ON ld.lieu=b.lieu_id ";
+				$sql_2 .= "INNER JOIN departements d ON d.departement_id=ld.dept ";
 				$sql_3 .= "ld.dept = '".$_POST['dept']."' ";
 				break;
 			// LIEU
@@ -167,4 +171,4 @@
 ?>
 <br>
 <br>
-<a href=".">Acceuil</a>
+<a href=".">Accueil</a>

@@ -321,20 +321,23 @@
 							$args = array();
 							
 							$args['headers'] = array();
-							$args['display'] = array(array('v',$_POST['type_l']));
+							$args['display'] = array();
 							
 							switch($_POST['type_l']) {
 								case 'lieu':
 									$title = "Lieux correspondants";
 									$args['headers'][] = 'Lieu';
+									$args['display'][] = array('v',$_POST['type_l']);
 									break;
 								case 'dept':
 									$title = "Départements correspondants";
 									$args['headers'][] = 'Département';
+									$args['display'][] = array('d','nom');
 									break;
 								case 'region':
 									$title = "Régions correspondantes";
 									$args['headers'][] = 'Région';
+									$args['display'][] = array('r','nom');
 									break;
 							}
 							
@@ -405,7 +408,7 @@
 									$args['join'] = 'precipitation_id';
 									$args['headers'][] = 'Force';
 									$args['display'][] = array('x','force');
-									$args['conditions'] = array('force '.$comp.' '.$_POST['value']);
+									$args['conditions'] = array('x.force '.$comp.' '.$_POST['value']);
 									switch($_POST['type_m']) {
 										case '0':
 											$args['headers'][] = 'Type';
@@ -432,11 +435,21 @@
 							$sql = "SELECT ".$selected.", COUNT(x.".$args['join'].") as nb ";
 							$sql .= "FROM bulletins b ";
 							$sql .= "INNER JOIN vlieudeptreg v ON v.lieu = b.lieu_id ";
+							switch($_POST['type_l']) {
+								case 'lieu':
+									break;
+								case 'dept':
+									$sql .= "INNER JOIN departements d ON d.departement_id = v.dept ";
+									break;
+								case 'region':
+									$sql .= "INNER JOIN regions r ON r.num = v.region ";
+									break;
+							}
 							$sql .= "INNER JOIN ".$args['table']." x ON b.".$args['join']." = x.".$args['join']." ";
 							$sql .= "WHERE ".implode(' AND ',$args['conditions'])." ";
 							$sql .= "GROUP BY ".$selected." ";
 							$sql .= "ORDER BY nb DESC";
-							
+
 							$query = $db->prepare($sql);
 							$query->execute();
 							$res = $query->fetchAll();
@@ -464,34 +477,53 @@
 							<?php
 							
 							
+							$args['display'][0] = array('v','lieu');
+							$args['headers'][0] = 'Lieu';
 							$selected = array();
 							foreach($args['display'] as $disp) {
 								$selected[] = implode('.',$disp);
 							}
-							
-							$sql2 = "SELECT ".implode(', ',$selected)." ";
+
+							$sql2 = "SELECT r.nom as reg, d.nom as dept, ".implode(', ',$selected)." ";
 							$sql2 .= "FROM bulletins b ";
 							$sql2 .= "INNER JOIN vlieudeptreg v ON v.lieu = b.lieu_id ";
+							$sql2 .= "INNER JOIN departements d ON d.departement_id = v.dept ";
+							$sql2 .= "INNER JOIN regions r ON r.num = v.region ";
 							$sql2 .= "INNER JOIN ".$args['table']." x ON b.".$args['join']." = x.".$args['join']." ";
 							$sql2 .= "WHERE ".implode(' AND ',$args['conditions'])." ";
 							$sql2 .= "ORDER BY v.lieu;";
-							
+
 							$query = $db->prepare($sql2);
 							$query->execute();
 							$res = $query->fetchAll();
 							
+							$display = array();
+							$headers = array();
+							switch($_POST['type_l']) {
+								case 'region':
+									$display[] = array('r','reg');
+									$headers[] = 'Région';
+								case 'dept':
+									$display[] = array('d','dept');
+									$headers[] = 'Département';
+								case 'lieu':
+									break;
+							}
+							$display = array_merge($display,$args['display']);
+							$headers = array_merge($headers,$args['headers']);
+
 							?>
 							<br>
 							<h3>Détails :</h3>
 							<table>
 								<tr>
-									<?php foreach($args['headers'] as $h): ?>
+									<?php foreach($headers as $h): ?>
 										<th><?php echo $h; ?></th>
 									<?php endforeach; ?>
 								</tr>
 								<?php foreach($res as $row) : ?>
 									<tr>
-									<?php foreach($args['display'] as $col): ?>
+									<?php foreach($display as $col): ?>
 										<td><?php echo $row[$col[1]]; ?></td>
 									<?php endforeach; ?>
 									</tr>
@@ -513,6 +545,6 @@
 	?>
 	<br>
 	<br>
-	<a href=".">Acceuil</a>
+	<a href=".">Accueil</a>
 	</body>
 </html>

@@ -368,7 +368,7 @@
 		
 		</br>
 		</br>
-		<a href=".">Acceuil</a>
+		<a href=".">Accueil</a>
 		
 		
 	

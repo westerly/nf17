@@ -340,7 +340,7 @@ include("connect.php"); ?>
 			<input type="submit" id="submit" disabled="true">
 		</form>
 		<br><br>
-		<a href=".">Acceuil</a>
+		<a href=".">Accueil</a>
 		<div hidden>
 			<select id="m_31">
 				<option value="1">1</option>

@@ -116,8 +116,6 @@
 							var_dump($error);
 						}else{
 							print "La nouvelle affectation du capteur a été effectuée avec succès.";
-							print"</br>";
-							print "<a href='./index.php'>Accueil </a>";
 						}
 					
 					}
@@ -188,6 +186,6 @@
 		?>
 	<br>
 	<br>
-	<a href=".">Acceuil</a>
+	<a href=".">Accueil</a>
 	</body>
 </html>
